@@ -1,8 +1,8 @@
 const Joi = require("joi");
 
-const userValidator = (schema)=>(payload)=>{
-    return schema.validate(payload, {abortEarly: false})
-}
+// const userValidator = (schema)=>(payload)=>{
+//     return schema.validate(payload, {abortEarly: false})
+// }
 
 const userRegistrationSchema = Joi.object({
   firstName: Joi.string().required(),
@@ -14,4 +14,12 @@ const userRegistrationSchema = Joi.object({
   confirmPassword: Joi.ref("password")
 });
 
-module.exports = userValidator(userRegistrationSchema);
+const userLoginSchema = Joi.object({
+  email: Joi.string().required(),
+  password: Joi.string().required()
+})
+
+module.exports = {
+  userRegistrationSchema
+
+}

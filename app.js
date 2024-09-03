@@ -4,9 +4,9 @@ const userRoutes = require("./routes/index.js");
 
 const app = express()
     .use(helmet())
-    .use("/", userRoutes)
     .use(express.json())
     .use(express.urlencoded({extended: false}))
+    .use("/", userRoutes)
 
 
     module.exports = app;
