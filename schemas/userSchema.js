@@ -17,9 +17,15 @@ const userRegistrationSchema = Joi.object({
 const userLoginSchema = Joi.object({
   email: Joi.string().required(),
   password: Joi.string().required()
+});
+
+const forgotPasswordSchema = Joi.object({
+  email: Joi.string().email({minDomainSegments: 2, tlds: {allow: ["com"]}})
 })
 
 module.exports = {
-  userRegistrationSchema
+  userRegistrationSchema,
+  userLoginSchema,
+  forgotPasswordSchema
 
 }
