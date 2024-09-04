@@ -1,11 +1,12 @@
 const express = require("express");
-const {createUser} = require("../controllers/index.js");
-const {userRegistrationSchema} = require("../schemas/userSchema.js");
+const {createUser, loginUser, logoutUser} = require("../controllers/index.js");
+const {userRegistrationSchema, userLoginSchema} = require("../schemas/userSchema.js");
 const {validateRequest} = require("../middleware/requestValidate.js");
 const router = express.Router();
 
 router.post("/register", validateRequest(userRegistrationSchema), createUser);
-// console.log(userRegistrationSchema);
+router.post("/login", validateRequest(userLoginSchema), loginUser);
+router.post("/logout", logoutUser);
 
 
 module.exports = router;
