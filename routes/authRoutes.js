@@ -8,4 +8,5 @@ const authRouter = express.Router();
 
 authRouter.post("/forgot-password", validateRequest(forgotPasswordSchema), forgotPassword)
 
+
 module.exports = authRouter;

@@ -6,8 +6,7 @@ const {PrismaClient} = require("@prisma/client");
 
 const prisma = new PrismaClient;
 
-const forgotPassword = async(req, res)=>{
-    console.log("Forgot Password route hit");
+const forgotPassword = async(req, res)=>{    
     try {
         const {email} = req.body;
 
@@ -25,8 +24,8 @@ const forgotPassword = async(req, res)=>{
         await prisma.passwordResetToken.create({
             data: {
                 token: hashedToken,
-                expiresAt,
-                user: isUserExists.id
+                expireAt: expiresAt,
+                userId: isUserExists.id
             }
         })
 

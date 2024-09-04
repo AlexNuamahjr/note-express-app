@@ -15,6 +15,6 @@ const app = express()
         cookie: {secure: false}
     }))
     .use("/", userRoutes)
-    .use("/auth", authRoutes);
+    .use("/auth", authRoutes)
 
     module.exports = app;
