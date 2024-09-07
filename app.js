@@ -1,8 +1,8 @@
-const express = require("express");
-const helmet = require("helmet");
-const expressSession = require("express-session");
-const userRoutes = require("./routes/index.js");
-const authRoutes = require("./routes/authRoutes.js");
+import express from "express";
+import helmet from "helmet";
+import expressSession from "express-session";
+import userRoutes from "./routes/index.js";
+import authRoutes from "./routes/authRoutes.js";
 
 const app = express()
     .use(helmet())
@@ -17,4 +17,4 @@ const app = express()
     .use("/", userRoutes)
     .use("/auth", authRoutes)
 
-    module.exports = app;
+    export default app;

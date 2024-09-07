@@ -1,5 +1,5 @@
 
-const validateRequest = (schema)=>{
+export const validateRequest = (schema)=>{
     return (req, res, next)=>{
         try {
             // console.log("validate request",req.body);
@@ -14,5 +14,3 @@ const validateRequest = (schema)=>{
         }
     }
 }
-
-module.exports = {validateRequest};

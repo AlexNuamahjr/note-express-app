@@ -1,9 +1,9 @@
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcrypt");
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcrypt";
 
 const prisma = new PrismaClient();
 
-const createUser = async (req, res) => {
+export const createUser = async (req, res) => {
   try {
     const { firstName, lastName, userName, email, dateOfBirth, password } =
       req.body;
@@ -34,12 +34,11 @@ const createUser = async (req, res) => {
   } catch (error) {
     return res.status(500).json({ error: "Error occured while creating user" });
   } finally {
-    await prisma.$disconnect();
-    process.exit(1);
+    await prisma.$disconnect();    
   }
 };
 
-const loginUser = async (req, res) => {
+export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
     // check if user exists
@@ -70,7 +69,7 @@ const loginUser = async (req, res) => {
   }
 };
 
-const logoutUser = (req, res) => {
+export const logoutUser = (req, res) => {
   try {
     req.session.destroy((error) => {
       if (error) {
@@ -84,8 +83,3 @@ const logoutUser = (req, res) => {
   }
 };
 
-module.exports = {
-  createUser,
-  loginUser,
-  logoutUser,
-};
