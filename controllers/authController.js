@@ -4,7 +4,6 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { PrismaClient } from "@prisma/client";
-import { log } from "console";
 
 const prisma = new PrismaClient();
 
@@ -24,8 +23,7 @@ export const forgotPassword = async (req, res) => {
     // generate a reset token
     const token = crypto.randomBytes(32).toString("hex");
     const hashedToken = await bcrypt.hash(token, 10);
-    console.log("Plain Token:", token);
-    console.log("Hashed Token:", hashedToken);
+   // set expiration
     const expiresAt = new Date(Date.now() + 36000000);
 
     // store the token
@@ -70,27 +68,20 @@ export const resetPassword = async (req, res) => {
   try {
     console.log("Query Object:", req.query);
     const { token, userId } = req.query;
-    // Log the received token and id
     console.log("Received token:", token);
     console.log("Received ID:", userId);
     // console.log("ID from query:", id);
-    const {newPassword} = req.body;
-    console.log(newPassword);
-    
-    // const userId = parseInt(id, 10);
-    // console.log("Parsed User ID:", userId);
-    
-
+    const {newPassword} = req.body;    
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
   }
-
     // find token in the database
     const resetTokenEntry = await prisma.passwordResetToken.findFirst({
       where: {
         userId: Number(userId),
         expireAt: { gte: new Date() },
       },
+      // get the latest token
       orderBy: {
         expireAt: "desc"
       }
@@ -104,18 +95,12 @@ export const resetPassword = async (req, res) => {
     console.log("Stored Token Entry:", resetTokenEntry);
 
     // check if token has expired
-    const now = new Date();
-    console.log("Current Time:", now);
-    console.log("Token Expiry Time:", resetTokenEntry.expireAt);
+    const now = new Date();    
     if(now > resetTokenEntry.expireAt){
       return res.status(400).json({ error: "Token has expired" });
     }
     // compare the provided token to the stored one in the database
-    const isTokenValid = await bcrypt.compare(token, resetTokenEntry.token);
-    
-    console.log("Provided Token (from query):", token);
-    console.log("Stored Hashed Token (from DB):", resetTokenEntry.token);
-    console.log("Is Token Valid:", isTokenValid);
+    const isTokenValid = await bcrypt.compare(token, resetTokenEntry.token);    
     if (!isTokenValid) {
       return res
         .status(400)

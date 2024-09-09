@@ -52,6 +52,7 @@ export const loginUser = async (req, res) => {
       password,
       isUserExists.password
     );
+    // check if password is correct
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: "Invalid credentials" });
     } else {
@@ -65,7 +66,6 @@ export const loginUser = async (req, res) => {
       .json({ error: "Error occured while loging in, kindly try again" });
   } finally {
     await prisma.$disconnect();
-    process.exit(1);
   }
 };
 
