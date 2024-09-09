@@ -55,7 +55,7 @@ export const loginUser = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: "Invalid credentials" });
     } else {
-      req.session.id  = isUserExists.id;
+      req.session.userId  = isUserExists.id;
       return res.status(201).json({ message: "Login successfully" });
     }
   } catch (error) {

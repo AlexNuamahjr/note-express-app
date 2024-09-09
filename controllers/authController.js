@@ -4,6 +4,7 @@ import crypto from "crypto";
 import bcrypt from "bcrypt";
 import nodemailer from "nodemailer";
 import { PrismaClient } from "@prisma/client";
+import { log } from "console";
 
 const prisma = new PrismaClient();
 
@@ -23,7 +24,9 @@ export const forgotPassword = async (req, res) => {
     // generate a reset token
     const token = crypto.randomBytes(32).toString("hex");
     const hashedToken = await bcrypt.hash(token, 10);
-    const expiresAt = new Date(Date.now() + 3600000);
+    console.log("Plain Token:", token);
+    console.log("Hashed Token:", hashedToken);
+    const expiresAt = new Date(Date.now() + 36000000);
 
     // store the token
     await prisma.passwordResetToken.create({
@@ -35,7 +38,7 @@ export const forgotPassword = async (req, res) => {
     });
 
     // create reset link
-    const resetUrl = `http://localhost:8756/reset-password?token=${token}&id=${isUserExists.id}`;
+    const resetUrl = `http://localhost:8756/auth/reset-password?token=${token}&userId=${isUserExists.id}`;
     console.log("Reset url", resetUrl);
 
     const transporter = nodemailer.createTransport({
@@ -66,12 +69,14 @@ export const forgotPassword = async (req, res) => {
 export const resetPassword = async (req, res) => {
   try {
     console.log("Query Object:", req.query);
-    const { token, id } = req.query;
+    const { token, userId } = req.query;
     // Log the received token and id
     console.log("Received token:", token);
-    console.log("Received ID:", id);
+    console.log("Received ID:", userId);
     // console.log("ID from query:", id);
-    // const {newPassword} = req.body;
+    const {newPassword} = req.body;
+    console.log(newPassword);
+    
     // const userId = parseInt(id, 10);
     // console.log("Parsed User ID:", userId);
     
@@ -81,41 +86,51 @@ export const resetPassword = async (req, res) => {
   }
 
     // find token in the database
+    const resetTokenEntry = await prisma.passwordResetToken.findFirst({
+      where: {
+        userId: Number(userId),
+        expireAt: { gte: new Date() },
+      },
+      orderBy: {
+        expireAt: "desc"
+      }
+    });
+    if (!resetTokenEntry) {
+      return res
+        .status(400)
+        .json({ error: "Invalid or expired password reset token!!!" });
+    }
 
-    // const resetTokenEntry = await prisma.passwordResetToken.findFirst({
-    //   where: {
-    //     userId: userId,
-    //     // expireAt: { gte: new Date() },
-    //   },
-    // });
-    // if (!resetTokenEntry) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Invalid or expired password reset token!!!d" });
-    // }
+    console.log("Stored Token Entry:", resetTokenEntry);
 
     // check if token has expired
-    // const now = new Date();
-    // if(now > passwordResetToken.expireAt){
-    //   return res.status(400).json({ error: "Token has expired" });
-    // }
-    // // compare the provided token to the stored one in the database
-    // const isTokenValid = await bcrypt.compare(token, resetTokenEntry.token);
-    // if (!isTokenValid) {
-    //   return res
-    //     .status(400)
-    //     .json({ error: "Invalid or expired password reset token" });
-    // }
-    // const hashedPassword = bcrypt.hash(newPassword, 10);
-    // await prisma.user.update({
-    //   where: { id: userId },
-    //   data: {
-    //     password: hashedPassword,
-    //   },
-    // });
-    // // delete the reset token from the database
-    // await prisma.passwordResetToken.delete({where: {id: resetTokenEntry.id}});
-    // return res.status(200).json({message: "Password reset successful"});
+    const now = new Date();
+    console.log("Current Time:", now);
+    console.log("Token Expiry Time:", resetTokenEntry.expireAt);
+    if(now > resetTokenEntry.expireAt){
+      return res.status(400).json({ error: "Token has expired" });
+    }
+    // compare the provided token to the stored one in the database
+    const isTokenValid = await bcrypt.compare(token, resetTokenEntry.token);
+    
+    console.log("Provided Token (from query):", token);
+    console.log("Stored Hashed Token (from DB):", resetTokenEntry.token);
+    console.log("Is Token Valid:", isTokenValid);
+    if (!isTokenValid) {
+      return res
+        .status(400)
+        .json({ error: "Invalid password reset token" });
+    } 
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await prisma.user.update({
+      where: {id: Number(userId)},
+      data: {
+        password: hashedPassword,
+      },
+    });
+    // delete the reset token from the database
+    await prisma.passwordResetToken.delete({where: {id: resetTokenEntry.id}});
+    return res.status(200).json({message: "Password reset successful"});
   } catch (error) {
     console.error(error);
     return res.status(500).json({error: "Something went wrong"})
