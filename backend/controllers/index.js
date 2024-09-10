@@ -226,7 +226,7 @@ export const uploadProfilePicture = async (req, res) => {
 
       const profilePictureUrl = req.file.path;
       // save the image url in the database profile table
-      console.log(`User : ${userId}  ProfileURL : ${profilePictureUrl}`);      
+      console.log(`User : ${userId}  ProfileURL : ${profilePictureUrl}`);
 
       // Check if user profile already exist
       const isExist = prisma.profile.findFirst({ where: { userId } });

@@ -12,7 +12,7 @@ const app = express()
     .use(expressSession({
         secret: process.env.APP_SECRET,
         resave: false,
-        saveUninitialized: true,
+        saveUninitialized: false,
         cookie: {secure: false}
     }))
     .use("/", userRoutes)

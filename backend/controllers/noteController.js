@@ -29,6 +29,26 @@ export const createNote = async (req, res) => {
   }
 };
 
+// read note
+export const viewNote = async (req, res)=>{
+  try {
+    const {userId} = req.session;
+    // find all notes beloging to authenticated user
+    const userNotes = await prisma.note.findMany({
+      where: {authorId: Number(userId)}
+    });
+    if (userNotes.length === 0){
+      return res.status(404).json({message: "No notes found"})
+    }
+    return res.status(200).json({notes: userNotes});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({error: "Error occur while retrieving notes"})
+  }finally{
+    await prisma.$disconnect()
+  }
+}
+
 // update note
 export const updateNote = async (req, res) => {
   try {
