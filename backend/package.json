@@ -2,10 +2,10 @@
   "name": "crud-express-app",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "./backend/index.js",
   "type": "module",
   "scripts": {
-    "server": "nodemon index"
+    "server": "nodemon ./backend/index"
   },
   "keywords": [],
   "author": "Alexander Nuamah Jr",

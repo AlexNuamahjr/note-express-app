@@ -1,9 +1,9 @@
 import express from "express";
 import helmet from "helmet";
 import expressSession from "express-session";
-import userRoutes from "./routes/index.js";
-import authRoutes from "./routes/authRoutes.js";
-import noteRoutes from "./routes/noteRoute.js";
+import userRoutes from "../backend/routes/index.js";
+import authRoutes from "../backend/routes/authRoutes.js";
+import noteRoutes from "../backend/routes/noteRoute.js";
 
 const app = express()
     .use(helmet())
