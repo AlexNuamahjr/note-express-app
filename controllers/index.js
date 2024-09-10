@@ -1,8 +1,11 @@
 import { PrismaClient } from "@prisma/client";
+import { genertateToken } from "../utils/tokenGenerator.js";
 import bcrypt from "bcrypt";
+import nodemailer from "nodemailer";
 
 const prisma = new PrismaClient();
 
+// register user
 export const createUser = async (req, res) => {
   try {
     const { firstName, lastName, userName, email, dateOfBirth, password } =
@@ -26,18 +29,95 @@ export const createUser = async (req, res) => {
         email,
         dateOfBirth: new Date(dateOfBirth),
         password: hashedPassword,
+        isVerified: false
       },
     });
+    // generate verification token
+    const plainToken = genertateToken();
+    // store hashed token
+    const hashedToken = await bcrypt.hash(plainToken, 10);
+    // store hashed token
+    await prisma.emailVerification.create({
+      data: {
+        token: hashedToken,
+        userId: newUser.id,
+        expireAt: new Date(Date.now() + 3600000)
+      }
+    });
+    // send token in email
+    const verificationUrl = `http://localhost:8756/verify-email?token=${plainToken}&userId=${newUser.id}`;
+    
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
+      },
+    });
+    const mailOption = {
+      from: "no-reply@noteapp.com",
+      to: email,
+      subject: "Verify your email",
+      text: `Please verify your email by clicking the following link: ${verificationUrl}`
+    };
+    await transporter.sendMail(mailOption);
+    
     return res
       .status(201)
-      .json({ message: "User created successfully", user: newUser });
+      .json({ message: "User created successfully, check your email for verification link.", user: newUser });
   } catch (error) {
+    console.error(error)
     return res.status(500).json({ error: "Error occured while creating user" });
   } finally {
     await prisma.$disconnect();    
   }
 };
 
+// verify email
+export const verifyEmail = async (req, res)=>{
+  try {
+    const {token, userId} = req.query;
+    // find verification token in the database
+    const tokenEntry = await prisma.emailVerification.findFirst({
+      where: {
+        userId: Number(userId),
+        expireAt: {gte: new Date()}
+      },
+      orderBy:{
+        expireAt: "desc"
+      }
+    });
+    if (!tokenEntry){
+      return res.status(400).json({ error: 'Invalid or expired token' });
+    }
+    // check if token has expired
+    const now = new Date();    
+    if(now > tokenEntry.expireAt){
+      return res.status(400).json({ error: "Token has expired" });
+    }
+    const isTokenValid = await bcrypt.compare(token, tokenEntry.token);
+    if (!isTokenValid) {
+      return res.status(400).json({ error: 'Invalid verification token' });
+    }
+    // mark as verify user
+    await prisma.user.update({
+      where: {id: Number(userId)},
+      data: {isVerified: true}
+    });
+    // delete verification token
+    await prisma.emailVerification.delete({
+      where: {id: tokenEntry.id}
+    })
+    return res.status(200).json({message: "Email verified successfully"})
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({error: "Error verifying email"});
+  }finally{
+    await prisma.$disconnect();
+  }
+}
+
+// login user
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -47,6 +127,10 @@ export const loginUser = async (req, res) => {
     });
     if (!isUserExists) {
       return res.status(401).json({ error: "Invalid credentials" });
+    }
+    // check for email verification
+    if (!isUserExists.isVerified){
+      return res.status(403).json({error: "Kindly verify your email before logging in"})
     }
     const isPasswordCorrect = await bcrypt.compare(
       password,
@@ -69,6 +153,7 @@ export const loginUser = async (req, res) => {
   }
 };
 
+// logout user
 export const logoutUser = (req, res) => {
   try {
     req.session.destroy((error) => {
