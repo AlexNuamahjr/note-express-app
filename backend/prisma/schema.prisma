@@ -51,7 +51,7 @@ model Note {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  authorId Int @unique
+  authorId Int
 }
 
 model PasswordResetToken {
