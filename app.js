@@ -3,6 +3,7 @@ import helmet from "helmet";
 import expressSession from "express-session";
 import userRoutes from "./routes/index.js";
 import authRoutes from "./routes/authRoutes.js";
+import noteRoutes from "./routes/noteRoute.js";
 
 const app = express()
     .use(helmet())
@@ -16,5 +17,6 @@ const app = express()
     }))
     .use("/", userRoutes)
     .use("/auth", authRoutes)
+    .use("/notes", noteRoutes)
 
     export default app;
