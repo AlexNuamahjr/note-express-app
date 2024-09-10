@@ -27,4 +27,9 @@ export const resetPasswordSchema = Joi.object({
 
 export const bioSchema = Joi.object({
   bio: Joi.string().required()
+});
+
+export const noteSchema = Joi.object({
+  title: Joi.string().required(),
+  content: Joi.string().required()
 })
