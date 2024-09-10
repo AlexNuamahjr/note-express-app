@@ -88,7 +88,7 @@ export const verifyEmail = async (req, res)=>{
       }
     });
     if (!tokenEntry){
-      return res.status(400).json({ error: 'Invalid or expired token' });
+      return res.status(400).json({ error: 'Invalid token' });
     }
     // check if token has expired
     const now = new Date();    
@@ -152,6 +152,33 @@ export const loginUser = async (req, res) => {
     await prisma.$disconnect();
   }
 };
+
+// update bio
+export const bio = async (req, res)=>{
+  try {
+    const {userId} = req.session;
+    const {bio} = req.body;
+
+    if (!bio){
+      return res.status(403).json({})
+    }
+
+    const updatedProfile = await prisma.profile.upsert({
+      where: {userId: Number(userId)},
+      update: {bio: bio},
+      create: {
+        bio: bio,
+        userId: Number(userId)
+      }
+    });
+    return res.status(200).json({message: "Profile updated successfully", updatedProfile});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({error: "Error occur while updating profile"})
+  }finally{
+    await prisma.$disconnect();
+  }
+}
 
 // logout user
 export const logoutUser = (req, res) => {
