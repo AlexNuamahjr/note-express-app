@@ -9,6 +9,6 @@ router.get("/verify-email", verifyEmail);
 router.post("/login", validateRequest(userLoginSchema), loginUser);
 router.put("/update-bio", validateRequest(bioSchema), bio);
 router.post("/logout", logoutUser);
-router.post("/delete-account", deleteUserAccount);
+router.delete("/delete-account", deleteUserAccount);
 
 export default router;
