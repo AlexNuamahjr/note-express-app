@@ -162,7 +162,7 @@ export const bio = async (req, res)=>{
     if (!bio){
       return res.status(403).json({})
     }
-
+    // update user bio
     const updatedProfile = await prisma.profile.upsert({
       where: {userId: Number(userId)},
       update: {bio: bio},
@@ -175,6 +175,32 @@ export const bio = async (req, res)=>{
   } catch (error) {
     console.error(error);
     return res.status(500).json({error: "Error occur while updating profile"})
+  }finally{
+    await prisma.$disconnect();
+  }
+};
+
+// delete user account
+export const deleteUserAccount = async (req, res)=>{
+  try {
+    const {userId} = req.session;
+    // check if user exists
+    const isUserExists = await prisma.user.findUnique({
+      where: {id: Number(userId)}
+    })
+    if (!isUserExists){
+      return res.status(404).json({error: "User not found"});
+    }
+    // delete user account
+    await prisma.user.delete({
+      where: {id: Number(userId)}
+    });
+    // clear user session
+    req.session.destroy();
+    return res.status(200).json({message: "User account deleted successfully"});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({error: "Error occur while deleting account"});
   }finally{
     await prisma.$disconnect();
   }
