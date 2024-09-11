@@ -7,11 +7,10 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-
+// forgot password
 export const forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-
     // check if the user exists
     const isUserExists = await prisma.user.findUnique({ where: { email } });
     if (!isUserExists) {
@@ -26,7 +25,6 @@ export const forgotPassword = async (req, res) => {
     const hashedToken = await bcrypt.hash(token, 10);
    // set expiration
     const expiresAt = new Date(Date.now() + 36000000);
-
     // store the token
     await prisma.passwordResetToken.create({
       data: {
@@ -35,7 +33,6 @@ export const forgotPassword = async (req, res) => {
         userId: isUserExists.id,
       },
     });
-
     // create reset link
     const resetUrl = `http://localhost:8756/auth/reset-password?token=${token}&userId=${isUserExists.id}`;
     console.log("Reset url", resetUrl);
@@ -65,13 +62,10 @@ export const forgotPassword = async (req, res) => {
   }
 };
 
+// reset password
 export const resetPassword = async (req, res) => {
-  try {
-    console.log("Query Object:", req.query);
-    const { token, userId } = req.query;
-    console.log("Received token:", token);
-    console.log("Received ID:", userId);
-    // console.log("ID from query:", id);
+  try {    
+    const { token, userId } = req.query;    
     const {newPassword} = req.body;    
     if (isNaN(userId)) {
       return res.status(400).json({ error: "Invalid user ID" });
@@ -92,8 +86,6 @@ export const resetPassword = async (req, res) => {
         .status(400)
         .json({ error: "Invalid or expired password reset token!!!" });
     }
-
-    console.log("Stored Token Entry:", resetTokenEntry);
 
     // check if token has expired
     const now = new Date();    
