@@ -1,6 +1,6 @@
 import express from "express";
 import {bio, createUser, deleteUserAccount, loginUser, logoutUser, uploadProfilePicture, verifyEmail} from "../controllers/index.js";
-import {bioSchema, userLoginSchema, userRegistrationSchema} from "../schemas/userSchema.js";
+import {bioSchema, userLoginSchema, userRegistrationSchema} from "../schemas/validationSchema.js";
 import { validateRequest } from "../middleware/requestValidate.js";
 import { isAuthenticated } from "../middleware/authenticate.js";
 const router = express.Router();

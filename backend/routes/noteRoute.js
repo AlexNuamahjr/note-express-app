@@ -1,6 +1,6 @@
 import express from "express";
 import { validateRequest } from "../middleware/requestValidate.js";
-import { noteSchema } from "../schemas/userSchema.js";
+import { noteSchema } from "../schemas/validationSchema.js";
 import { createNote, deleteNote, updateNote, viewNote } from "../controllers/noteController.js";
 import { isAuthenticated } from "../middleware/authenticate.js";
 
