@@ -4,6 +4,7 @@ import expressSession from "express-session";
 import userRoutes from "../backend/routes/index.js";
 import authRoutes from "../backend/routes/authRoutes.js";
 import noteRoutes from "../backend/routes/noteRoute.js";
+import profileRoutes from "../backend/routes/profileRoutes.js";
 
 const app = express()
     .use(helmet())
@@ -18,5 +19,6 @@ const app = express()
     .use("/", userRoutes)
     .use("/auth", authRoutes)
     .use("/notes", noteRoutes)
+    .use("/profile", profileRoutes)
 
     export default app;
