@@ -151,6 +151,7 @@ export const getDeletedNotes = async (req, res) => {
         deleteAt: { not: null },
       },
     });
+    
     return res.status(200).json({ message: deletedNotes });
   } catch (error) {
     console.error(error);
@@ -159,3 +160,24 @@ export const getDeletedNotes = async (req, res) => {
     await prisma.$disconnect();
   }
 };
+
+// restore soft deleted notes
+export const restoreDeletedNotes = async (req, res)=>{
+  try {
+    const {userId} = req.session;
+    const {noteId} = req.params;
+
+    const restoreNote = await prisma.note.update({
+      where: {id: Number(noteId), authorId: Number(userId)},
+      data: {
+        deleteAt: null
+      }
+    });
+    return res.status(200).json({message: "Note restored successfully", restoreNote});
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({message: "Error restoring notes"});
+  }finally{
+    await prisma.$disconnect();
+  }
+}
