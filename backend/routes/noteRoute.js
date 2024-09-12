@@ -11,6 +11,4 @@ noteRouter.post("/create-notes", isAuthenticated, validateRequest(noteSchema), c
 noteRouter.put("/update-note/:noteId", isAuthenticated, updateNote);
 noteRouter.delete("/delete-note/:noteId", isAuthenticated, deleteNote);
 
-
-
 export default noteRouter;
