@@ -32,4 +32,9 @@ export const bioSchema = Joi.object({
 export const noteSchema = Joi.object({
   title: Joi.string().required(),
   content: Joi.string().required()
+});
+
+export const changePasswordSchema = Joi.object({
+  oldPassword: Joi.string().required(),
+  newPassword: Joi.string().required()
 })
