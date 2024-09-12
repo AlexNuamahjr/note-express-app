@@ -32,7 +32,6 @@ export const changePassword = async (req, res)=>{
             }
         });
         return res.status(200).json({message: "Password updated successfully"});
-
     } catch (error) {
         console.error(error);
         return res.status(500).json({message: "Error occur while changing password"});
