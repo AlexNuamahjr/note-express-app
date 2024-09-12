@@ -32,7 +32,6 @@ export const createUser = async (req, res) => {
   try {
     const { firstName, lastName, userName, email, dateOfBirth, password } =
       req.body;
-
     // check if user exists
     const isUserExists = await prisma.user.findFirst({
       where: { email: email },
@@ -41,7 +40,8 @@ export const createUser = async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
     // hash password
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
     // create new user
     const newUser = await prisma.user.create({
       data: {
@@ -83,7 +83,6 @@ export const createUser = async (req, res) => {
       text: `Please verify your email by clicking the following link: ${verificationUrl}`,
     };
     await transporter.sendMail(mailOption);
-
     return res.status(201).json({
       message:
         "User created successfully, check your email for verification link.",
@@ -166,6 +165,7 @@ export const loginUser = async (req, res) => {
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: "Invalid credentials" });
     } else {
+      // login user
       req.session.userId = isUserExists.id;
       return res.status(201).json({ message: "Login successfully" });
     }
@@ -185,9 +185,6 @@ export const bio = async (req, res) => {
     const { userId } = req.session;
     const { bio } = req.body;
 
-    if (!bio) {
-      return res.status(403).json({});
-    }
     // update user bio
     const updatedProfile = await prisma.profile.upsert({
       where: { userId: Number(userId) },
@@ -222,8 +219,7 @@ export const uploadProfilePicture = async (req, res) => {
       // Check if file is uploaded
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
-      }
-
+      };
       const profilePictureUrl = req.file.path;
       // save the image url in the database profile table
       console.log(`User : ${userId}  ProfileURL : ${profilePictureUrl}`);
