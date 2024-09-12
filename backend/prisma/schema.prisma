@@ -50,6 +50,7 @@ model Note {
   content String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deleteAt DateTime?
   author User @relation(fields: [authorId], references: [id], onDelete: Cascade)
   authorId Int
 }
