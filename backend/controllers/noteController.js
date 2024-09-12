@@ -35,7 +35,10 @@ export const viewNote = async (req, res) => {
     const { userId } = req.session;
     // find all notes beloging to authenticated user
     const userNotes = await prisma.note.findMany({
-      where: { authorId: Number(userId) },
+      where: { 
+        authorId: Number(userId),
+        deleteAt: null
+      },
     });
     if (userNotes.length === 0) {
       return res.status(404).json({ message: "No notes found" });
@@ -118,7 +121,7 @@ export const deleteNote = async (req, res) => {
 
     // soft delete note
     const softDelete = await prisma.note.update({
-      where: { id: Number(noteId), authorId: Number(userId) },
+      where: { id: Number(noteId)},
       data: { deleteAt: new Date() },
     });
 
