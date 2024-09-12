@@ -1,7 +1,7 @@
 import express from "express";
 import { validateRequest } from "../middleware/requestValidate.js";
 import { noteSchema } from "../schemas/validationSchema.js";
-import { createNote, deleteNote, getDeletedNotes, restoreDeletedNotes, updateNote, viewNote } from "../controllers/noteController.js";
+import { createNote, deleteNote, getDeletedNotes, permanentDeleteNote, restoreDeletedNotes, updateNote, viewNote } from "../controllers/noteController.js";
 import { isAuthenticated } from "../middleware/authenticate.js";
 
 const noteRouter = express.Router();
@@ -15,7 +15,9 @@ noteRouter.post("/create-notes", isAuthenticated, validateRequest(noteSchema), c
 noteRouter.post("/restore/:noteId", isAuthenticated, restoreDeletedNotes);
 // update notes
 noteRouter.put("/update-note/:noteId", isAuthenticated, updateNote);
-// delete notes
+// soft delete notes
 noteRouter.delete("/delete-note/:noteId", isAuthenticated, deleteNote);
+// permanently delete note
+noteRouter.delete("/delete-permanent/:noteId", isAuthenticated, permanentDeleteNote);
 
 export default noteRouter;

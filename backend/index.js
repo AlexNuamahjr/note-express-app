@@ -11,13 +11,13 @@ const port = process.env.PORT;
 app.use("/", userRoutes);
 app.use("/auth", authRoutes);
 app.use("/notes", noteRoutes);
-app.use("profile", profileRoutes);
+app.use("/profile", profileRoutes);
 // handle invalid endpoints
 app.use("*", function(req, res){
     if (req.accepts('json')){
         return res.status(404).json({status: 404, message: "Invalid Endpoint"})
     }
-})
+});
 
 const startServer = ()=>{
     app.listen(port, ()=>{
