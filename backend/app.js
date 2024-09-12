@@ -1,12 +1,14 @@
 import express from "express";
+import dotEnv from "dotenv";
+dotEnv.config();
 import helmet from "helmet";
+import morgan from "morgan";
+import cors from "cors";
 import expressSession from "express-session";
-import userRoutes from "../backend/routes/index.js";
-import authRoutes from "../backend/routes/authRoutes.js";
-import noteRoutes from "../backend/routes/noteRoute.js";
-import profileRoutes from "../backend/routes/profileRoutes.js";
 
 const app = express()
+    .use(cors())
+    .use(morgan("dev"))
     .use(helmet())
     .use(express.json())
     .use(express.urlencoded({extended: false}))
@@ -14,11 +16,7 @@ const app = express()
         secret: process.env.APP_SECRET,
         resave: false,
         saveUninitialized: false,
-        cookie: {secure: false}
+        cookie: {secure: process.env.NODE_ENV}
     }))
-    .use("/", userRoutes)
-    .use("/auth", authRoutes)
-    .use("/notes", noteRoutes)
-    .use("/profile", profileRoutes)
 
     export default app;
