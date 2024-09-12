@@ -30,24 +30,26 @@ export const createNote = async (req, res) => {
 };
 
 // read note
-export const viewNote = async (req, res)=>{
+export const viewNote = async (req, res) => {
   try {
-    const {userId} = req.session;
+    const { userId } = req.session;
     // find all notes beloging to authenticated user
     const userNotes = await prisma.note.findMany({
-      where: {authorId: Number(userId)}
+      where: { authorId: Number(userId) },
     });
-    if (userNotes.length === 0){
-      return res.status(404).json({message: "No notes found"})
+    if (userNotes.length === 0) {
+      return res.status(404).json({ message: "No notes found" });
     }
-    return res.status(200).json({notes: userNotes});
+    return res.status(200).json({ notes: userNotes });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({error: "Error occur while retrieving notes"})
-  }finally{
-    await prisma.$disconnect()
+    return res
+      .status(500)
+      .json({ error: "Error occur while retrieving notes" });
+  } finally {
+    await prisma.$disconnect();
   }
-}
+};
 
 // update note
 export const updateNote = async (req, res) => {
@@ -75,7 +77,9 @@ export const updateNote = async (req, res) => {
       where: { id: Number(noteId) },
       data: {
         title: title ? `${isNoteExists.title}\n${title}` : isNoteExists.title,
-        content: content ? `${isNoteExists.content}\n${content}` : isNoteExists.content
+        content: content
+          ? `${isNoteExists.content}\n${content}`
+          : isNoteExists.content,
       },
     });
 
@@ -92,37 +96,63 @@ export const updateNote = async (req, res) => {
   }
 };
 
-// delete note
-export const deleteNote = async (req, res)=>{
-    try {
-        const {userId} = req.session;
-        const {noteId} = req.params;
+// soft delete note
+export const deleteNote = async (req, res) => {
+  try {
+    const { userId } = req.session;
+    const { noteId } = req.params;
 
-        // check if note exists
-        const isNoteExists = await prisma.note.findUnique({
-            where: {id: Number(noteId)}
-        });
+    // check if note exists
+    const isNoteExists = await prisma.note.findUnique({
+      where: { id: Number(noteId) },
+    });
 
-        if (!isNoteExists){
-            return res.status(404).json({error: "Note not found"});
-        }
-
-        // ensure the user is the owner of the note
-        if (isNoteExists.authorId !== userId){
-            return res.status(400).json({error: "Unauthorize"});
-        }
-
-        // delete note
-        await prisma.note.delete({
-            where: {id: Number(noteId)}
-        })
-
-        return res.status(200).json({message: "Note deleted successfully"});
-
-    } catch (error) {
-        console.error(error);
-        return res.status(500).json({error: "An error occur while deleting note"})
-    }finally{
-        await prisma.$disconnect();
+    if (!isNoteExists) {
+      return res.status(404).json({ error: "Note not found" });
     }
-}
+
+    // ensure the user is the owner of the note
+    if (isNoteExists.authorId !== userId) {
+      return res.status(400).json({ error: "Unauthorize" });
+    }
+
+    // soft delete note
+    const softDelete = await prisma.note.update({
+      where: { id: Number(noteId), authorId: Number(userId) },
+      data: { deleteAt: new Date() },
+    });
+
+    if (!softDelete) {
+      return res
+        .status(404)
+        .json({ message: "Note not found or already deleted" });
+    }
+
+    return res.status(200).json({ message: "Note moved to bin" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: "Error deleting note" });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
+
+// get soft deleted notes
+export const getDeletedNotes = async (req, res) => {
+  try {
+    const { userId } = req.session;
+    // find soft deleted notes
+    const deletedNotes = await prisma.note.findMany({
+      where: {
+        authorId: userId,
+        deleteAt: { not: null },
+      },
+    });
+    return res.status(200).json({ message: deletedNotes });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error retrieving notes" });
+  } finally {
+    await prisma.$disconnect();
+  }
+};
