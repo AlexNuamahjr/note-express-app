@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Layout from "../../../components/Layout";
 
 function ResetPassword() {
   const [password, setPassword] = useState("");
@@ -10,7 +11,8 @@ function ResetPassword() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <Layout>
+    <div className="mt-10 flex items-center justify-center bg-gray-100">
       <div className="max-w-md w-full bg-white p-8 shadow-md rounded-lg">
         <h1 className="text-2xl font-semibold mb-6 text-center">
           Reset Password
@@ -60,6 +62,7 @@ function ResetPassword() {
         </form>
       </div>
     </div>
+    </Layout>
   );
 }
 
