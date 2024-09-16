@@ -8,11 +8,12 @@ import {
   MenuItems,
 } from "@headlessui/react";
 import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 const navigation = [
-  { name: "Home", href: "#", current: true },
-  { name: "Bin", href: "#", current: false },
-  { name: "Notes", href: "#", current: false },
+  { name: "Home", to: "#", current: true },
+  { name: "Bin", href: "/bin", current: false },
+  { name: "Notes", to: "#", current: false },
 ];
 
 function classNames(...classes) {
@@ -49,9 +50,9 @@ const Header = () => {
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex justify-between space-x-4">
                 {navigation.map((item) => (
-                  <a
+                  <Link
                     key={item.name}
-                    href={item.href}
+                    to={item.href}
                     aria-current={item.current ? "page" : undefined}
                     className={classNames(
                       item.current
@@ -61,7 +62,7 @@ const Header = () => {
                     )}
                   >
                     {item.name}
-                  </a>
+                  </Link>
                 ))}
               </div>
             </div>
