@@ -14,7 +14,7 @@ const Layout = ({ children }) => {
       <Header toggleSidebar={toggleSidebar} />
 
       {/* Main content area */}
-      <main className="flex-1 p-4 bg-gray-100">{children}</main>
+      <main className="flex-1 bg-gray-100">{children}</main>
     </div>
   );
 };
