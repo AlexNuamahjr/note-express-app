@@ -7,6 +7,8 @@ export const userRegistrationSchema = Joi.object({
   email: Joi.string().email({minDomainSegments: 2, tlds: {allow: ["com"]}}),
   dateOfBirth: Joi.string().required(),
   password: Joi.string().required(),
+  gender: Joi.string().required("Gender is required"),
+  phoneNumber: Joi.string().required("Phone number is required"),
   confirmPassword: Joi.ref("password")
 });
 
