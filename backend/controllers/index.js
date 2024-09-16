@@ -30,7 +30,7 @@ const upload = multer({ storage: storage });
 // register user
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, userName, email, dateOfBirth, password } =
+    const { firstName, lastName, userName, email, dateOfBirth, password, gender, phoneNumber } =
       req.body;
     // check if user exists
     const isUserExists = await prisma.user.findFirst({
@@ -51,6 +51,8 @@ export const createUser = async (req, res) => {
         email,
         dateOfBirth: new Date(dateOfBirth),
         password: hashedPassword,
+        gender,
+        phoneNumber,
         isVerified: false,
       },
     });
