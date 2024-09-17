@@ -5,6 +5,7 @@ import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
+import { log } from "console";
 
 const prisma = new PrismaClient();
 
@@ -30,8 +31,10 @@ const upload = multer({ storage: storage });
 // register user
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, userName, email, dateOfBirth, password, gender, phoneNumber } =
+    const { firstName, lastName, userName, email, dob, password, gender, phoneNumber } =
       req.body;
+      console.log(req.body);
+      
     // check if user exists
     const isUserExists = await prisma.user.findFirst({
       where: { email: email },
@@ -49,7 +52,7 @@ export const createUser = async (req, res) => {
         lastName,
         userName,
         email,
-        dateOfBirth: new Date(dateOfBirth),
+        dateOfBirth: new Date(dob).toISOString(),
         password: hashedPassword,
         gender,
         phoneNumber,
