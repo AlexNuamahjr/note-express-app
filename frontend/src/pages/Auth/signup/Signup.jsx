@@ -1,39 +1,74 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { registrationValidationSchema } from "../../../utils/validationSchema";
 
 const Register = () => {
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [comfirmPassword, setComfirmPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [dob, setDob] = useState("");
-  const [gender, setGender] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(registrationValidationSchema),
+  });
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+
+      const response = await axios.post("http://localhost:8756/register", {
+        ...data,
+      });
+      if (response.status === 201) {
+        toast.success("Registration successful");
+        setTimeout(() => {
+          navigate("/email-confirmation");
+        }, 2000);
+      } else {
+        toast.error(`Unexpected error: ${response.status}`);
+      }
+    } catch (error) {
+      console.log(error);
+      if (error.response) {
+        const message = error.response.data.message || "Registration failed";
+        toast.error(message);
+      } else if (error.request) {
+        toast.error("Network error, please try again");
+      } else {
+        toast.error("An unexpected error occured!");
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-4xl">
         <h2 className="text-2xl text-center font-bold mb-6">Register</h2>
-        <form onSubmit={handleSubmit}>
+        <ToastContainer />
+        <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
               <label className="block text-gray-700 text-sm font-bold mb-2">
                 Firstname
               </label>
               <input
+                {...register("firstName")}
                 type="text"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Firstname"
-                value={firstname}
-                onChange={(e) => setFirstname(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">
+                {errors.firstName?.message}
+              </p>
             </div>
 
             {/* Last name */}
@@ -42,13 +77,12 @@ const Register = () => {
                 Last name
               </label>
               <input
-                type="email"
+                {...register("lastName")}
+                type="text"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Last name"
-                value={lastname}
-                onChange={(e) => setLastname(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">{errors.lastName?.message}</p>
             </div>
             {/* Username */}
             <div>
@@ -56,13 +90,12 @@ const Register = () => {
                 Username
               </label>
               <input
+                {...register("userName")}
                 type="text"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">{errors.username?.message}</p>
             </div>
 
             {/* Email */}
@@ -71,13 +104,12 @@ const Register = () => {
                 Email
               </label>
               <input
+                {...register("email")}
                 type="email"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">{errors.email?.message}</p>
             </div>
 
             {/* Phone Number */}
@@ -86,13 +118,14 @@ const Register = () => {
                 Phone Number
               </label>
               <input
-                type="tel"
+                {...register("phoneNumber")}
+                type="text"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Phone Number"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">
+                {errors.phoneNumber?.message}
+              </p>
             </div>
 
             {/* Date of Birth */}
@@ -101,12 +134,11 @@ const Register = () => {
                 Date of Birth
               </label>
               <input
+                {...register("dob")}
                 type="date"
                 className="w-full p-2 border border-gray-300 rounded"
-                value={dob}
-                onChange={(e) => setDob(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">{errors.dob?.message}</p>
             </div>
 
             {/* Gender */}
@@ -115,16 +147,15 @@ const Register = () => {
                 Gender
               </label>
               <select
+                {...register("gender")}
                 className="w-full p-2 border border-gray-300 rounded"
-                value={gender}
-                onChange={(e) => setGender(e.target.value)}
-                required
               >
                 <option value="">Select Gender</option>
                 <option value="male">Male</option>
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
+              <p className="text-red-500 text-sm">{errors.gender?.message}</p>
             </div>
 
             {/* Password */}
@@ -133,13 +164,12 @@ const Register = () => {
                 Password
               </label>
               <input
+                {...register("password")}
                 type="password"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
               />
+              <p className="text-red-500 text-sm">{errors.password?.message}</p>
             </div>
             <div className="">
               <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -149,15 +179,21 @@ const Register = () => {
                 type="password"
                 className="w-full p-2 border border-gray-300 rounded"
                 placeholder="Password"
-                value={comfirmPassword}
-                onChange={(e) => setComfirmPassword(e.target.value)}
-                required
               />
             </div>
           </div>
 
-          <button className="w-full bg-blue-600 text-white p-2 rounded mb-4">
-            Register
+          <button
+            className="w-full bg-blue-600 text-white p-2 rounded mb-4"
+            disabled={loading}
+          >
+            {loading ? (
+              <div className="flex justify-center">
+                <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-t-transparent"></div>
+              </div>
+            ) : (
+              "Register"
+            )}
           </button>
 
           <p className="text-sm text-center">
