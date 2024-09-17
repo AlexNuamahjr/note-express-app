@@ -5,7 +5,7 @@ export const userRegistrationSchema = Joi.object({
   lastName: Joi.string().required(),
   userName: Joi.string().alphanum().min(5).required(),
   email: Joi.string().email({minDomainSegments: 2, tlds: {allow: ["com"]}}),
-  dateOfBirth: Joi.string().required(),
+  dob: Joi.string().required(),
   password: Joi.string().required(),
   gender: Joi.string().required("Gender is required"),
   phoneNumber: Joi.string().required("Phone number is required"),
