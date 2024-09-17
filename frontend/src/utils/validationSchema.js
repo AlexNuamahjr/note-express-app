@@ -7,7 +7,7 @@ export const registrationValidationSchema = yup.object().shape({
   userName: yup.string().required("Username is required"),
   gender: yup.string().required("Gender is required"),
   phoneNumber: yup.string().required("Phone number is required"),
-  dob: yup.date().required("Date of birth is required"),
+  dob: yup.string().required("Date of birth is required"),
   password: yup.string().required("Password is required"),
 });
 
