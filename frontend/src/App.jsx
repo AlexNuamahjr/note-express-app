@@ -1,7 +1,6 @@
 import {
   BrowserRouter,
   Route,
-  BrowserRouter as Router,
   Routes,
 } from "react-router-dom";
 import Login from "./pages/Auth/login/Login";
@@ -13,6 +12,8 @@ import EditProfile from "./pages/profile/Profile";
 import ChangePassword from "./pages/Auth/changePassword/changePassword";
 import ForgotPassword from "./pages/Auth/forgotPassword/ForgotPassword";
 import Settings from "./pages/settings/Settings";
+import EmailConfirmation from "./pages/Auth/emailComfirmation/emailComfirmation";
+import EmailVerification from "./pages/Auth/emailVerification/emailVerification";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
         <Route path="/change-password" element={<ChangePassword />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/email-confirmation" element={<EmailConfirmation />} />
+        <Route path="/verify-email" element={<EmailVerification />} />
       </Routes>
     </BrowserRouter>
   );

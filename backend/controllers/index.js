@@ -72,7 +72,7 @@ export const createUser = async (req, res) => {
       },
     });
     // send token in email
-    const verificationUrl = `http://localhost:8756/verify-email?token=${plainToken}&userId=${newUser.id}`;
+    const verificationUrl = `http://localhost:5173/verify-email?token=${plainToken}&userId=${newUser.id}`;
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -105,6 +105,8 @@ export const createUser = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token, userId } = req.query;
+    console.log('Query ', req.query);
+    
     // find verification token in the database
     const tokenEntry = await prisma.emailVerification.findFirst({
       where: {
