@@ -174,6 +174,8 @@ export const loginUser = async (req, res) => {
     } else {
       // login user
       req.session.userId = isUserExists.id;
+      console.log(req.session.userId);
+      
       return res.status(201).json({ message: "Login successfully" });
     }
   } catch (error) {
@@ -185,6 +187,16 @@ export const loginUser = async (req, res) => {
     await prisma.$disconnect();
   }
 };
+
+export const checkSession = async(req, res)=>{
+  console.log(req.session.userId);
+  
+  if (req.session.userId){
+    return res.status(200).json({isAuthenticated: true})
+  }else{
+    return res.status(401).json({isAuthenticated: false})
+  }
+}
 
 // update bio
 export const bio = async (req, res) => {
