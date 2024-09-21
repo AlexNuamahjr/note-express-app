@@ -7,7 +7,10 @@ import cors from "cors";
 import expressSession from "express-session";
 
 const app = express()
-    .use(cors())
+    .use(cors({
+        origin: "http://localhost:5173",
+        credentials: true
+    }))
     .use(morgan("dev"))
     .use(helmet())
     .use(express.json())
