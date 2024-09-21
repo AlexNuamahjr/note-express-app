@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, redirect } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { toast, ToastContainer } from "react-toastify";
@@ -9,6 +9,8 @@ import { yupResolver } from "@hookform/resolvers/yup";
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  
   const {
     register,
     handleSubmit,
@@ -18,19 +20,34 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
+    
     try {
+      
       setLoading(true);
       const response = await axios.post("http://localhost:8756/login", {
         ...data,
       });
-      if (response.status != 201) {
-        toast.error("Invalid credentials");
+      if (response.status === 200 && response.status === 201) {
+        
+        toast.success(response.data.message || "Login successfully");
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
+      } else {
+        toast.error(`Unexpected error: ${response.status}`);
+        console.log("Unexpected response data:", response.data);
       }
-      toast.success("Login successfully");
-      redirect("/")
     } catch (error) {
-      console.log(error);
-      toast.error("Internal server error");
+      console.log("Login error",error);
+      if (error.response) {
+        const message = error.response.data.message || "Invalid Credentials";
+        toast.error(message);
+        
+      } else if (error.request) {
+        toast.error("Network error, please try again");
+      } else {
+        toast.error("An unexpected error occured!");
+      }
     } finally {
       setLoading(false);
     }
