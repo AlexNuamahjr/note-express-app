@@ -106,7 +106,7 @@ const NoteCard = ({ note }) => {
 
       {/* View Modal */}
       {isViewModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 md:w-1/2">
             <h3 className="text-xl font-bold mb-4">{note.title}</h3>
             <p>{note.content}</p>
@@ -122,7 +122,7 @@ const NoteCard = ({ note }) => {
 
       {/* Edit Modal */}
       {isEditModalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-3/4 md:w-1/2">
             <h3 className="text-xl font-bold mb-4">Edit {note.title}</h3>
             <div className="space-y-4">
