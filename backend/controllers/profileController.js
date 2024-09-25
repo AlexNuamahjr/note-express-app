@@ -4,7 +4,7 @@ const prisma = new PrismaClient();
 // get user profile
 export const getProfile = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const userId = req.user.id;
 
     const isUserProfile = await prisma.user.findUnique({
       where: { id: Number(userId) },
@@ -36,7 +36,7 @@ export const getProfile = async (req, res) => {
 // update user profile
 export const updateUserProfile = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId = req.user.id;
     const { firstName, lastName, bio, profilePictureUrl } = req.body;
 
     // check if user exists

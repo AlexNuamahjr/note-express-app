@@ -5,7 +5,7 @@ const prisma = new PrismaClient();
 
 export const changePassword = async (req, res)=>{
     try {
-        const {userId} = req.session;
+        const userId = req.user.id;
         const {oldPassword, newPassword} = req.body;
 
         // check if user exists
