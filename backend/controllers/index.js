@@ -5,9 +5,11 @@ import nodemailer from "nodemailer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import multer from "multer";
-import { log } from "console";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
+
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // configure cloudinary
 cloudinary.config({
@@ -31,10 +33,18 @@ const upload = multer({ storage: storage });
 // register user
 export const createUser = async (req, res) => {
   try {
-    const { firstName, lastName, userName, email, dob, password, gender, phoneNumber } =
-      req.body;
-      console.log(req.body);
-      
+    const {
+      firstName,
+      lastName,
+      userName,
+      email,
+      dob,
+      password,
+      gender,
+      phoneNumber,
+    } = req.body;
+    console.log(req.body);
+
     // check if user exists
     const isUserExists = await prisma.user.findFirst({
       where: { email: email },
@@ -105,8 +115,8 @@ export const createUser = async (req, res) => {
 export const verifyEmail = async (req, res) => {
   try {
     const { token, userId } = req.query;
-    console.log('Query ', req.query);
-    
+    console.log("Query ", req.query);
+
     // find verification token in the database
     const tokenEntry = await prisma.emailVerification.findFirst({
       where: {
@@ -171,13 +181,26 @@ export const loginUser = async (req, res) => {
     // check if password is correct
     if (!isPasswordCorrect) {
       return res.status(401).json({ error: "Invalid credentials" });
-    } else {
-      // login user
-      req.session.userId = isUserExists.id;
-      console.log(req.session.userId);
-      
-      return res.status(201).json({ message: "Login successfully" });
     }
+
+    const token = jwt.sign(
+      {
+        userId: isUserExists.id,
+        email: isUserExists.email,
+      },
+      JWT_SECRET,
+      { expiresIn: "2h" }
+    );
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV,
+      maxAge: 7200000,
+    });
+    // login user and send token to the client
+    return res.status(200).json({
+      message: "Login successfully",
+      token,
+    });
   } catch (error) {
     console.error(error);
     return res
@@ -187,17 +210,6 @@ export const loginUser = async (req, res) => {
     await prisma.$disconnect();
   }
 };
-
-export const checkSession = async(req, res)=>{
-  console.log(req.session.userId);
-  
-  if (req.session.userId){
-    return res.status(200).json({isAuthenticated: true})
-  }else{
-    return res.status(401).json({isAuthenticated: false})
-  }
-}
-
 // update bio
 export const bio = async (req, res) => {
   try {
@@ -238,7 +250,7 @@ export const uploadProfilePicture = async (req, res) => {
       // Check if file is uploaded
       if (!req.file) {
         return res.status(400).json({ error: "No file uploaded" });
-      };
+      }
       const profilePictureUrl = req.file.path;
       // save the image url in the database profile table
       console.log(`User : ${userId}  ProfileURL : ${profilePictureUrl}`);
@@ -298,13 +310,11 @@ export const deleteUserAccount = async (req, res) => {
 // logout user
 export const logoutUser = (req, res) => {
   try {
-    req.session.destroy((error) => {
-      if (error) {
-        return res.status(401).json({ error: "Logout failed" });
-      } else {
-        return res.status(201).json({ message: "Logout successfully" });
-      }
+    res.clearCookie("jwt", " ", {
+      httpOnly: true,
+      expires: new Date(0),
     });
+    return res.status(200).json({ message: "Logout successfully" });
   } catch (error) {
     return res.status(500).json({ error: "Enternal server error" });
   }
