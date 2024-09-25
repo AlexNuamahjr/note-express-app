@@ -4,7 +4,7 @@ dotEnv.config();
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
-import expressSession from "express-session";
+import cookieParser from "cookie-parser";
 
 const app = express()
     .use(cors({
@@ -14,12 +14,7 @@ const app = express()
     .use(morgan("dev"))
     .use(helmet())
     .use(express.json())
+    .use(cookieParser())
     .use(express.urlencoded({extended: false}))
-    .use(expressSession({
-        secret: process.env.APP_SECRET,
-        resave: false,
-        saveUninitialized: false,
-        cookie: {secure: process.env.NODE_ENV}
-    }))
 
     export default app;
