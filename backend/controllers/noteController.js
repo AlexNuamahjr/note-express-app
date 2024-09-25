@@ -32,7 +32,7 @@ export const createNote = async (req, res) => {
 // read note
 export const viewNote = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     // find all notes beloging to authenticated user
     const userNotes = await prisma.note.findMany({
       where: {
@@ -57,7 +57,7 @@ export const viewNote = async (req, res) => {
 // update note
 export const updateNote = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     const { title, content } = req.body;
     const { noteId } = req.params;
 
@@ -102,7 +102,7 @@ export const updateNote = async (req, res) => {
 // soft delete note
 export const deleteNote = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     const { noteId } = req.params;
 
     // check if note exists
@@ -143,7 +143,7 @@ export const deleteNote = async (req, res) => {
 // get soft deleted notes
 export const getDeletedNotes = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     // find soft deleted notes
     const deletedNotes = await prisma.note.findMany({
       where: {
@@ -167,7 +167,7 @@ export const getDeletedNotes = async (req, res) => {
 // restore soft deleted notes
 export const restoreDeletedNotes = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     const { noteId } = req.params;
     // restore soft deleted notes
     const restoreNote = await prisma.note.update({
@@ -190,7 +190,7 @@ export const restoreDeletedNotes = async (req, res) => {
 // permanently delete note
 export const permanentDeleteNote = async (req, res)=>{
   try {
-    const {userId} = req.session;
+    const userId  = req.user.id;
     const {noteId} = req.params;
     // check if note exists
     const isNoteExists = await prisma.note.findUnique({
