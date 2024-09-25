@@ -213,7 +213,7 @@ export const loginUser = async (req, res) => {
 // update bio
 export const bio = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     const { bio } = req.body;
 
     // update user bio
@@ -240,7 +240,7 @@ export const bio = async (req, res) => {
 
 // uploading profile picture
 export const uploadProfilePicture = async (req, res) => {
-  const { userId } = req.session;
+  const userId  = req.user.id;
   upload.single("profilePicture")(req, res, async (err) => {
     if (err) {
       console.error(err);
@@ -280,7 +280,7 @@ export const uploadProfilePicture = async (req, res) => {
 // delete user account
 export const deleteUserAccount = async (req, res) => {
   try {
-    const { userId } = req.session;
+    const userId  = req.user.id;
     // check if user exists
     const isUserExists = await prisma.user.findUnique({
       where: { id: Number(userId) },
