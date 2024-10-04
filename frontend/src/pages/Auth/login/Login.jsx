@@ -10,7 +10,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  
+
   const {
     register,
     handleSubmit,
@@ -20,15 +20,21 @@ const Login = () => {
   });
 
   const onSubmit = async (data) => {
-    
     try {
-      
       setLoading(true);
-      const response = await axios.post("http://localhost:8756/login", {
-        ...data,
-      });
-      if (response.status === 200 && response.status === 201) {
-        
+      const response = await axios.post(
+        "http://localhost:8756/login",
+        {
+          ...data,
+        },
+        { withCredentials: true }
+      );
+      if (response.status === 200 || response.status === 201) {
+        const token = response.data.token;
+        if (token) {
+          localStorage.setItem("token", token);
+        }
+
         toast.success(response.data.message || "Login successfully");
         setTimeout(() => {
           navigate("/");
@@ -38,11 +44,10 @@ const Login = () => {
         console.log("Unexpected response data:", response.data);
       }
     } catch (error) {
-      console.log("Login error",error);
+      console.log("Login error", error);
       if (error.response) {
         const message = error.response.data.message || "Invalid Credentials";
         toast.error(message);
-        
       } else if (error.request) {
         toast.error("Network error, please try again");
       } else {
