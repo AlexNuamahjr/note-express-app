@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useForm } from "react-hook-form";
@@ -116,7 +116,7 @@ const Login = () => {
 
         {/* Sign Up Link */}
         <p className="text-sm text-center mt-4">
-          Don't have an account?{" "}
+          Dont have an account?{" "}
           <Link to="/register" className="text-blue-600 hover:underline">
             Sign Up
           </Link>
